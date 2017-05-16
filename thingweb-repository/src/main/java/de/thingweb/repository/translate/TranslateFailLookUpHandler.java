@@ -1,0 +1,160 @@
+package de.thingweb.repository.translate;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.DCTerms;
+
+import de.thingweb.repository.Repository;
+import de.thingweb.repository.ThingDescriptionHandler;
+import de.thingweb.repository.ThingDescriptionUtils;
+import de.thingweb.repository.rest.BadRequestException;
+import de.thingweb.repository.rest.NotFoundException;
+import de.thingweb.repository.rest.RESTException;
+import de.thingweb.repository.rest.RESTHandler;
+import de.thingweb.repository.rest.RESTResource;
+import de.thingweb.repository.rest.RESTServerInstance;
+
+import org.json.JSONObject;
+
+public class TranslateFailLookUpHandler extends RESTHandler {
+
+	public TranslateFailLookUpHandler(List<RESTServerInstance> instances) {
+		super("fail", instances);
+	}
+
+	@Override
+	public RESTResource get(URI uri, Map<String, String> parameters) throws RESTException {
+	  
+		RESTResource resource = new RESTResource(name(uri), this);
+		resource.contentType = "application/ld+json";
+		
+		System.out.println("Entra en TranslateFailLookUpHandler get function");
+		
+		List<String> translations = new ArrayList<String>();
+		String query;
+				
+		// Return all Translations
+		try {
+			translations = TranslateUtils.listTranslations("/translate-fail");
+		} catch (Exception e) {
+			throw new BadRequestException();
+		}
+		
+		JSONObject root = new JSONObject();
+		for(String translation: translations){
+		    URI translationUri = URI.create(translation);
+		    
+		    System.out.printf("translationUri %s\n", translationUri.toString());
+		    translation = translationUri.getPath();
+		    String id = translation.substring(translation.lastIndexOf("/")+1);
+            List<String> entries = Arrays.asList(id.split("_"));
+            JSONObject obj = TranslateUtils.createObject(entries.get(0), entries.get(1), entries.get(2));
+			root.put(translation, obj);
+		}
+		resource.content = root.toString();
+		return resource;
+			
+	}
+	
+	public static void addEntry(URI uri, String id) {
+		
+		// Check if the parameter is null
+		if (id.isEmpty()) {
+			return;
+		} 
+		
+		System.out.println("Entra en addEntry");
+		
+		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
+		// Checking if the translation has already registered in the dataset.
+		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
+		
+		if (!registeredFailTranslation.isEmpty()){
+			System.out.println("registeredFailTranslation is NOT empty");
+			return;
+		}
+		
+		// to add new translation to the collection
+		//String resourceUri = "http://" + uri.getHost() + "/translate-fail/" + id;
+				
+		System.out.printf("addEntry in resourceUri %s\n", str_uri);
+		
+		Dataset dataset = Repository.get().dataset;
+
+		dataset.begin(ReadWrite.WRITE);
+		try {
+			
+			Model tdb = dataset.getDefaultModel();
+			ThingDescriptionUtils utils = new ThingDescriptionUtils();
+			
+			String currentDate = utils.getCurrentDateTime(0);
+			tdb.createResource(str_uri).addProperty(DC.source, "");
+			tdb.getResource(str_uri).addProperty(DCTerms.created, currentDate);
+			tdb.getResource(str_uri).addProperty(DCTerms.modified, currentDate);
+			
+			dataset.commit();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dataset.end();
+		}	
+	}
+	
+	
+	public static void delete(URI uri, String id) {
+
+		// Check if the parameter is null
+		if (id.isEmpty()) {
+			return;
+		} 
+		
+		System.out.println("Entra en delete");
+		
+		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
+		
+		// Checking if the translation has already registered in the dataset.
+		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
+		if (registeredFailTranslation.isEmpty()){
+			System.out.println("registeredFailTranslation is empty");
+			return;
+		}
+		
+		// Construct the id of the transaction
+	    //String resourceUri = "/translate-fail/" + id;
+	    
+		Dataset dataset = Repository.get().dataset;
+		dataset.begin(ReadWrite.WRITE);
+		try {
+			//dataset.getDefaultModel().getResource(resourceUri).removeProperties();
+			dataset.getDefaultModel().createResource(str_uri).removeProperties();
+			//deleteToAll(id);
+			dataset.commit();
+									
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dataset.end();
+		}
+	}
+	
+	private String name(URI uri) {
+		
+		String path = uri.getPath();
+		if (path.contains("/")) {
+			return path.substring(uri.getPath().lastIndexOf("/") + 1);
+		}
+		return path;
+	}
+}
