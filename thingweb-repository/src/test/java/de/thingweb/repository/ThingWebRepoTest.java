@@ -85,6 +85,7 @@ public class ThingWebRepoTest {
 		RESTResource resource;
 		byte[] content;
 		String tdId, tdId2, td;
+		ThingDescriptionHandler tdh;
 		
 		// LOOKUP
 		Set<String> tdIds;
@@ -100,8 +101,11 @@ public class ThingWebRepoTest {
 		fanQR = JSON.parse(resource.content);
 		tdIds = fanQR.keys();
 		
+		tdId = resource.path;
+		tdh = new ThingDescriptionHandler(tdId, Repository.get().servers);
+		
 		for (String item : tdIds){
-			tdch.delete(new URI(baseUri + item), null, null);
+			tdh.delete(new URI(baseUri + item), null, null);
 		}
 
 		parameters.clear();
@@ -151,7 +155,7 @@ public class ThingWebRepoTest {
 		Assert.assertFalse("TD temperatureSensor found", tdIds.contains(tdId2));
 		
 		// GET TD by id
-		ThingDescriptionHandler tdh = new ThingDescriptionHandler(tdId, Repository.get().servers);
+		tdh = new ThingDescriptionHandler(tdId, Repository.get().servers);
 		resource = tdh.get(new URI(baseUri + tdId), null);
 		JsonObject o = JSON.parse(resource.content);
 		JsonValue v = o.get("uris").getAsArray().get(0);
