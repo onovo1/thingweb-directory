@@ -247,7 +247,7 @@ Failure: 500 Internal Server Error
 
 ###### Discover the Translations based on different type of lookups
 
-####### Fetch the translation of a specific TD 
+- Fetch the translation of a specific TD 
 
 ```sh
 Method: GET
@@ -261,7 +261,7 @@ Method: GET
  Failure: 400 Bad Request
  Failure: 500 Internal Server Error
  ```
- ####### Fetch all the translations in the dataset
+ - Fetch all the translations in the dataset
  
 ```sh
 Method: GET
@@ -273,9 +273,7 @@ Method: GET
  Failure: 500 Internal Server Error
  ```
  
-/translate-lookup/fail
-
- ####### Search for the fail translation. 
+ - Search for the fail translation. 
  
  Fail translations are the translations that do not exist into the dataset but an endpoint has requested it at any point in time.
 
