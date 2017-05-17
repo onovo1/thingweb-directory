@@ -49,6 +49,7 @@ Content-Type: application/ld+json
 Payload: content of a TD.jsonld file
 Success: 201 Created
 Failure: 400 Bad Request
+Failure: 415 TD does not have URI
 Failure: 500 Internal Server Error
 ```
 
@@ -185,6 +186,109 @@ coap://localhost:8080/td-lookup/sem?text="word1 AND word2"
 ```sh
 coap://localhost:8080/td-lookup/sem?rdf=http://example.org/lightBrightness
 ```
+
+#### Translations
+
+Translations translates between two Thing Descriptions (TDs). TDs are the semantic representation of the information of a thing. However, different things have a limited understanding of the information represented in all the TDs. For this reason, a translation between TDs is needed. Thus, different things can interact and understand each other even though their TDs are different.
+The translations do not have lifetime and stay permanently in the system.
+
+This API can create,read, update and delete (CRUD) translations. The functionality includes but is not limited to following cases:
+
+  - Searching for a specific Translation or listing all the translations in the database;
+  - Creating a new Translation or updating an existing one;
+  - Deleting a Translation;
+  - Searching for the translations requested by things but not defined in the database;
+  
+###### Creates (adds) a Translation to a collection `/translate`.
+
+```sh
+Method: POST
+URI Template: /translate
+Request Parameters:
+ source := Source TD (compulsory). The source TD of the translation.
+ target := Target TD (compulsory). The target TD of the translation.
+ rt := Resource (compulsory). The resource name of the TD that is translated. 
+Content-Type: application/ld+json
+Payload: content of a TD.jsonld file
+Success: 201 Created
+Failure: 400 Bad Request
+Failure: 500 Internal Server Error
+```
+
+If the response code is `201 Created`, the URI path of the created sub-resource is defined in the header field `Location` (for HTTP) or `Location-Path` (for CoAP). The path is relative to the root resource and follows the pattern `/translate/{id}`, where `id` is an ID assigned by the repository for the uploaded Translation.
+
+If the associated uris of the new TD are already in the dataset, the response code is `400 Bad Request`. This is done in order to avoid duplicated Translations in the dataset. To change an existing Translation use PUT instead.
+
+###### Updates an existing Translation.
+
+```sh
+Method: PUT
+URI Template: /translate/{id}
+URI Template Parameter:   
+  {id} := ID of a Translation to be updated.
+Payload: content of a TD.jsonld file
+Content-Type: application/ld+json
+Success: 200 OK
+Failure: 400 Bad Request
+Failure: 500 Internal Server Error
+```
+
+###### Deletes an existing Translation.
+
+```sh
+Method: DELETE
+URI Template: /translate/{id}
+URI Template Parameter:   
+  {id} := ID of a Translation to be deleted
+Content-Type: application/ld+json
+Success: 200 OK
+Failure: 400 Bad Request
+Failure: 500 Internal Server Error
+```
+
+###### Discover the Translations based on different type of lookups
+
+- Fetch the translation of a specific TD 
+
+```sh
+ Method: GET
+ URI Template: /translate-lookup
+ Request Parameters:
+   source := Source TD (Compulsory).
+   target := Target TD (Compulsory).
+   rt     := Resource (Compulsory).
+ Content-Type: application/ld+json
+ Success: 200 OK
+ Failure: 400 Bad Request
+ Failure: 500 Internal Server Error
+ ```
+ - Fetch all the translations in the dataset
+ 
+```sh
+ Method: GET
+ URI Template: /translate-lookup
+ Request Parameters:
+   none
+ Content-Type: application/ld+json
+ Success: 200 OK
+ Failure: 400 Bad Request
+ Failure: 500 Internal Server Error
+ ```
+ 
+ - Search all the fail translations 
+ 
+ Fail translations are the translations that do not exist into the dataset but an endpoint has requested it at any point in time.
+
+```sh
+  Method: GET
+  URI Template:  /translate-lookup/fail
+  Request Parameters:
+    none
+  Content-Type: application/ld+json
+  Success: 200 OK
+  Failure: 400 Bad Request
+  Failure: 500 Internal Server Error
+ ```
 
 ## Swagger Specification of Thingweb-Repository API
 
