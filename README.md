@@ -273,7 +273,7 @@ Method: GET
  Failure: 500 Internal Server Error
  ```
  
- - Search for the fail translation. 
+ - Search all the fail translations 
  
  Fail translations are the translations that do not exist into the dataset but an endpoint has requested it at any point in time.
 
