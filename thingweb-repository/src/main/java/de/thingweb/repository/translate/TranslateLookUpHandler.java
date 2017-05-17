@@ -12,6 +12,8 @@ import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
 import de.thingweb.repository.rest.RESTServerInstance;
 
+import org.json.JSONObject;
+
 public class TranslateLookUpHandler extends RESTHandler {
 
 	public TranslateLookUpHandler(List<RESTServerInstance> instances) {

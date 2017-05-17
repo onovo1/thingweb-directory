@@ -30,8 +30,6 @@ import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
 import de.thingweb.repository.rest.RESTServerInstance;
 
-import org.json.JSONObject;
-
 public class TranslateCollectionHandler extends RESTHandler {
 
 	public TranslateCollectionHandler(List<RESTServerInstance> instances) {
