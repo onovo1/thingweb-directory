@@ -250,7 +250,7 @@ Failure: 500 Internal Server Error
 - Fetch the translation of a specific TD 
 
 ```sh
-Method: GET
+ Method: GET
  URI Template: /translate-lookup
  Request Parameters:
    source := Source TD (Compulsory).
@@ -264,9 +264,10 @@ Method: GET
  - Fetch all the translations in the dataset
  
 ```sh
-Method: GET
+ Method: GET
  URI Template: /translate-lookup
  Request Parameters:
+   none
  Content-Type: application/ld+json
  Success: 200 OK
  Failure: 400 Bad Request
