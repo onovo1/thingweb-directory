@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
 import de.thingweb.repository.rest.RESTServerInstance;
+import de.thingweb.repository.rest.UnsupportedFormat;
 
 public class ThingDescriptionHandler extends RESTHandler {
 
@@ -62,7 +64,7 @@ public class ThingDescriptionHandler extends RESTHandler {
 	
 	@Override
 	public void put(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
-		
+		boolean registeredTD = false;
 		String data = "";
 		try {
 			data = ThingDescriptionUtils.streamToString(payload);
@@ -72,9 +74,20 @@ public class ThingDescriptionHandler extends RESTHandler {
 		}
 		
 		// Check if new TD has uris already registered in the dataset
-		if (ThingDescriptionUtils.hasInvalidURI(data, uri.toString())) {
+		try {
+			registeredTD = ThingDescriptionUtils.registeredTD(data);
+		} catch (URISyntaxException e) {
+			throw new UnsupportedFormat();
+		}
+				
+		if (registeredTD){
 			throw new BadRequestException();
 		}
+				
+		// Check if new TD has uris already registered in the dataset
+		/*if (ThingDescriptionUtils.hasInvalidURI(data, uri.toString())) {
+			throw new BadRequestException();
+		}*/
 		
 		Dataset dataset = Repository.get().dataset;
 		dataset.begin(ReadWrite.WRITE);
