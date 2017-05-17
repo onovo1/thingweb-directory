@@ -39,6 +39,8 @@ import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTServerInstance;
 
+import de.thingweb.repository.translate.*;
+
 public class Repository {
   
     // TODO make it private
@@ -89,6 +91,16 @@ public class Repository {
         List<String> tds = new ArrayList<>();
 
         for (String uri : ThingDescriptionUtils.listThingDescriptions("?s ?p ?o")) {
+            tds.add(uri.substring(uri.lastIndexOf("/") + 1));
+        }
+
+        return tds;
+    }
+    
+    private static List<String> listTranslations() {
+        List<String> tds = new ArrayList<>();
+
+        for (String uri : TranslateUtils.listTranslations("/translate/")) {
             tds.add(uri.substring(uri.lastIndexOf("/") + 1));
         }
 
@@ -164,6 +176,7 @@ public class Repository {
     	// Default values
         int portCoAP = 5683;
         int portHTTP = 8080;
+     
         String loc = "db"; // directory to store the database //"jena-config.ttl";
         String lucene = "Lucene"; // directory to store lucene index
         
@@ -216,7 +229,18 @@ public class Repository {
             for (String td : listThingDescriptions()) {
                 i.add("/td/" + td, new ThingDescriptionHandler(td, servers));
             }
-      
+            //Querying specific Translation
+            i.add("/translate-lookup", new TranslateLookUpHandler(servers));
+            
+            //Adding/modifying/deleting Translations
+            i.add("/translate", new TranslateCollectionHandler(servers));
+            for (String translate : listTranslations()) {
+                i.add("/translate/" + translate, new TranslateHandler(translate, servers));
+            }
+            //Query Fail Translation Lookups (stored as /translate-fail/ in the database)
+            i.add("/translate-lookup/fail", new TranslateFailLookUpHandler(servers));
+            //i.add("/fail-lookup", new TranslateFailLookUpHandler(servers));
+            
             i.start();
         }
         
