@@ -159,7 +159,7 @@ public class ThingDescriptionUtils
    * 
    * @return true or false.
    */
-  public static boolean hasTDwithSameURI(String uri, String href) {
+  public static boolean hasTDwithSameURI(String uri, String href, String tdId) {
 	
 	boolean decision = false;
 	String query = "";
@@ -189,7 +189,13 @@ public class ThingDescriptionUtils
 		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
 		ResultSet result = qexec.execSelect();
 		
-		if (result.hasNext()) decision= true;
+		while (result.hasNext()) {
+			id = result.next().get("s").toString();
+			if (!id.equalsIgnoreCase(tdId)) {
+				decision= true;
+				break;
+			}
+		}
 		
 		qexec.close();
 
@@ -206,12 +212,13 @@ public class ThingDescriptionUtils
   /**
    * Returns true if td's uris are already registered
    * in the database, false otherwise.
+   * Unless td is in the dataset with tdId.
    * 
    * It returns an error if the TD does not have any URI associated.
    * 
    * @return true or false.
    */
-  public static boolean registeredTD(String td) throws URISyntaxException {
+  public static boolean registeredTD(String td, String tdId) throws URISyntaxException {
 
       JSONObject root = new JSONObject(td);
       
@@ -220,7 +227,7 @@ public class ThingDescriptionUtils
         for (int i = 0; i < uris.length(); ++i) {
     	    String uri = uris.getString(i);
     	    
-    	    if (hasTDwithSameURI(uri,null)) return true;
+    	    if (hasTDwithSameURI(uri,null,tdId)) return true;
         }
       } else if (root.has("base") && root.has("interactions")){
     	  String base = root.getString("base");
@@ -237,9 +244,9 @@ public class ThingDescriptionUtils
           	      
             	      //Check if the URI is a partial URI
             	      if (uri.toLowerCase().startsWith("coap://") || uri.toLowerCase().startsWith("http://")){ 
-              	        if (hasTDwithSameURI(uri,null)) return true;
+              	        if (hasTDwithSameURI(uri,null,tdId)) return true;
             	      } else {
-          	        	if (hasTDwithSameURI(base,uri)) return true;
+          	        	if (hasTDwithSameURI(base,uri,tdId)) return true;
           	          }
       	          } else {
             	    	//the TD does not have any URI
@@ -261,7 +268,7 @@ public class ThingDescriptionUtils
       	          JSONObject link = links.getJSONObject(y);
       	          if (link.has("href")){
           	        String uri = link.getString("href");
-          	        if (hasTDwithSameURI(uri,null)) return true;
+          	        if (hasTDwithSameURI(uri,null,tdId)) return true;
       	          } else {
           	    	//the TD does not have any URI
            	    	throw new URISyntaxException("TD does not have URI", td);

@@ -139,9 +139,9 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			throw new BadRequestException();
 		}
 		
-		// Check if new TD has uris already registered in the dataset
+		// Check if new TD has uris already registered in the dataset or that TD is already registered
 		try {
-			registeredTD = ThingDescriptionUtils.registeredTD(data);
+			registeredTD = ThingDescriptionUtils.registeredTD(data, null);
 		} catch (URISyntaxException e) {
 			throw new UnsupportedFormat();
 		}

@@ -75,7 +75,7 @@ public class ThingDescriptionHandler extends RESTHandler {
 		
 		// Check if new TD has uris already registered in the dataset
 		try {
-			registeredTD = ThingDescriptionUtils.registeredTD(data);
+			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString());
 		} catch (URISyntaxException e) {
 			throw new UnsupportedFormat();
 		}
