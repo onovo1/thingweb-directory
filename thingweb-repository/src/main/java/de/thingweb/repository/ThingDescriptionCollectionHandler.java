@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.apache.jena.vocabulary.RDFS;
 
 import de.thingweb.repository.rest.BadRequestException;
 import de.thingweb.repository.rest.NotFoundException;
+import de.thingweb.repository.rest.UnsupportedFormat;
 import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
@@ -128,6 +130,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 	@Override
 	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
 		
+		boolean registeredTD = false;
 		String data = "";
 		try {
 			data = ThingDescriptionUtils.streamToString(payload);
@@ -137,9 +140,20 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		}
 		
 		// Check if new TD has uris already registered in the dataset
-		if (ThingDescriptionUtils.hasInvalidURI(data)) {
+		try {
+			registeredTD = ThingDescriptionUtils.registeredTD(data);
+		} catch (URISyntaxException e) {
+			throw new UnsupportedFormat();
+		}
+		
+		if (registeredTD){
 			throw new BadRequestException();
 		}
+		
+		// Check if new TD has uris already registered in the dataset
+		/*if (ThingDescriptionUtils.hasInvalidURI(data)) {
+			throw new BadRequestException();
+		}*/
 		
 		// to register a resource following the standard
 		String endpointName = "http://example.org/"; // this is temporary
