@@ -64,7 +64,7 @@ public class TranslateUtils
       obj.put("rt", rt);
       return obj;
   }
-  
+
   
   /**
    * Returns the content of a translation stored in the database given its id.
@@ -92,6 +92,7 @@ public class TranslateUtils
 	return output;
   }
 
+  
   /**
    * Returns the last substring of a string limited by '/'.
    * @param string to parse.
@@ -136,6 +137,7 @@ public class TranslateUtils
 	return output;
 	
   }
+  
   
   /**
    * Returns the content of a translation stored in the database given its id.

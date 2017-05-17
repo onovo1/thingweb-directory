@@ -229,7 +229,7 @@ public class Repository {
             for (String td : listThingDescriptions()) {
                 i.add("/td/" + td, new ThingDescriptionHandler(td, servers));
             }
-            //Querying specific Translation
+            //Querying all the Translations or specific Translation
             i.add("/translate-lookup", new TranslateLookUpHandler(servers));
             
             //Adding/modifying/deleting Translations

@@ -1,6 +1,8 @@
 package de.thingweb.repository.translate;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,28 +30,57 @@ public class TranslateLookUpHandler extends RESTHandler {
 		
 		resource.content = "{";
 		
+		// Single request of a Translation
 		// GET source and target TD IDs from query parameters
 		if (parameters.containsKey("source") && !parameters.get("source").isEmpty() && parameters.containsKey("target")
 				&& !parameters.get("target").isEmpty()&& parameters.containsKey("rt") && !parameters.get("rt").isEmpty()) {
 			source = TranslateUtils.getid(parameters.get("source"));
 			target = TranslateUtils.getid(parameters.get("target"));
 			rt 	   = parameters.get("rt");
+			
+			String id = source + "_" + target + "_" + rt;
+			
+			output = TranslateUtils.getTranslateFromId(uri, id);
+			
+			// If it's empty add it into the failed lookup list
+			if (output.isEmpty()) {
+				TranslateFailLookUpHandler.addEntry(uri, id);		
+			}
+			
+			resource.content = output;
+							
+			resource.content += "}";
+			
+	    // List of the Translations of the database
+		} else if (parameters.isEmpty()){
+			
+			List<String> translations = new ArrayList<String>();
+					
+			// Return all Translations
+			try {
+				translations = TranslateUtils.listTranslations("/translate/");
+			} catch (Exception e) {
+				throw new BadRequestException();
+			}
+			
+			JSONObject root = new JSONObject();
+			for(String translation: translations){
+				
+			    URI translationUri = URI.create(translation);
+			    
+			    translation = translationUri.getPath();
+			    String id = translation.substring(translation.lastIndexOf("/")+1);
+			    
+	            List<String> entries = Arrays.asList(id.split("_"));
+	            JSONObject obj = TranslateUtils.createObject(entries.get(0), entries.get(1), entries.get(2));
+				root.put(translation, obj);
+			}
+			resource.content = root.toString();
+			
 		} else {
 			throw new BadRequestException();
 		}
-		
-		String id = source + "_" + target + "_" + rt;
-		
-		output = TranslateUtils.getTranslateFromId(uri, id);
-		
-		// If it's empty add it into the failed lookup list
-		if (output.isEmpty()) {
-			TranslateFailLookUpHandler.addEntry(uri, id);		
-		}
-		
-		resource.content = output;
-						
-		resource.content += "}";	
+			
 		return resource;
 	}
 	

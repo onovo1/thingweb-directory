@@ -37,39 +37,6 @@ public class TranslateCollectionHandler extends RESTHandler {
 	public TranslateCollectionHandler(List<RESTServerInstance> instances) {
 		super("translate", instances);
 	}
-	
-	@Override
-	public RESTResource get(URI uri, Map<String, String> parameters) throws RESTException {
-	  
-		RESTResource resource = new RESTResource(name(uri), this);
-		resource.contentType = "application/ld+json";
-		
-		List<String> translations = new ArrayList<String>();
-		String query;
-				
-		// Return all Translations
-		try {
-			translations = TranslateUtils.listTranslations("/translate/");
-		} catch (Exception e) {
-			throw new BadRequestException();
-		}
-		
-		JSONObject root = new JSONObject();
-		for(String translation: translations){
-			
-		    URI translationUri = URI.create(translation);
-		    
-		    translation = translationUri.getPath();
-		    String id = translation.substring(translation.lastIndexOf("/")+1);
-		    
-            List<String> entries = Arrays.asList(id.split("_"));
-            JSONObject obj = TranslateUtils.createObject(entries.get(0), entries.get(1), entries.get(2));
-			root.put(translation, obj);
-		}
-		resource.content = root.toString();
-		return resource;
-			
-	}
 
 	@Override
 	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
@@ -121,7 +88,6 @@ public class TranslateCollectionHandler extends RESTHandler {
 			ThingDescriptionUtils utils = new ThingDescriptionUtils();
 			
 			String currentDate = utils.getCurrentDateTime(0);
-			//tdb.getResource(resourceUri.toString()).addProperty(RDFS.isDefinedBy, id);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.created, currentDate);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.modified, currentDate);
 			
