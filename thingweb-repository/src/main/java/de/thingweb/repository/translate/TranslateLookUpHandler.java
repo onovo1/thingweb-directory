@@ -28,8 +28,6 @@ public class TranslateLookUpHandler extends RESTHandler {
 		
 		resource.content = "{";
 		
-		System.out.println("Entra en TranslateLookUpHandler get");
-		
 		// GET source and target TD IDs from query parameters
 		if (parameters.containsKey("source") && !parameters.get("source").isEmpty() && parameters.containsKey("target")
 				&& !parameters.get("target").isEmpty()&& parameters.containsKey("rt") && !parameters.get("rt").isEmpty()) {

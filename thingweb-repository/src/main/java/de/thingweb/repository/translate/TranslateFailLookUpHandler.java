@@ -39,8 +39,6 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 		RESTResource resource = new RESTResource(name(uri), this);
 		resource.contentType = "application/ld+json";
 		
-		System.out.println("Entra en TranslateFailLookUpHandler get function");
-		
 		List<String> translations = new ArrayList<String>();
 		String query;
 				
@@ -55,7 +53,6 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 		for(String translation: translations){
 		    URI translationUri = URI.create(translation);
 		    
-		    System.out.printf("translationUri %s\n", translationUri.toString());
 		    translation = translationUri.getPath();
 		    String id = translation.substring(translation.lastIndexOf("/")+1);
             List<String> entries = Arrays.asList(id.split("_"));
@@ -74,21 +71,15 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 			return;
 		} 
 		
-		System.out.println("Entra en addEntry");
-		
+		// create the new id for the entry
 		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
+		
 		// Checking if the translation has already registered in the dataset.
 		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
 		
 		if (!registeredFailTranslation.isEmpty()){
-			System.out.println("registeredFailTranslation is NOT empty");
 			return;
 		}
-		
-		// to add new translation to the collection
-		//String resourceUri = "http://" + uri.getHost() + "/translate-fail/" + id;
-				
-		System.out.printf("addEntry in resourceUri %s\n", str_uri);
 		
 		Dataset dataset = Repository.get().dataset;
 
@@ -120,26 +111,20 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 			return;
 		} 
 		
-		System.out.println("Entra en delete");
-		
+		// create the id of the entry
 		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
 		
 		// Checking if the translation has already registered in the dataset.
 		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
 		if (registeredFailTranslation.isEmpty()){
-			System.out.println("registeredFailTranslation is empty");
 			return;
 		}
 		
-		// Construct the id of the transaction
-	    //String resourceUri = "/translate-fail/" + id;
-	    
 		Dataset dataset = Repository.get().dataset;
 		dataset.begin(ReadWrite.WRITE);
 		try {
 			//dataset.getDefaultModel().getResource(resourceUri).removeProperties();
 			dataset.getDefaultModel().createResource(str_uri).removeProperties();
-			//deleteToAll(id);
 			dataset.commit();
 									
 		} catch (Exception e) {

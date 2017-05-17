@@ -40,7 +40,6 @@ public class TranslateUtils
 	    
   	  String select = "SELECT DISTINCT ?s WHERE { ?s dc:source ?o FILTER regex(str(?s), \"" + path + "\", \"i\")}";
 	  
-  	  System.out.printf("listTranslations select is %s\n", select);
 	  Query q = QueryFactory.create(prefix + "\n" + select);
 	  try (QueryExecution qexec = QueryExecutionFactory.create(q, dataset)) {
 		ResultSet result = qexec.execSelect();
@@ -81,8 +80,6 @@ public class TranslateUtils
 	try {
 		String q = "SELECT ?str WHERE { <" + uri + "> <" + DC.source + "> ?str }";
 		
-		System.out.printf("getTranslateFromURI q is %s\n ", q);
-		
 		QueryExecution qexec = QueryExecutionFactory.create(q, dataset);
 		ResultSet result = qexec.execSelect();
 		if (result.hasNext()) {
@@ -92,7 +89,6 @@ public class TranslateUtils
 		dataset.end();
 	}
 	
-	System.out.printf("output is %s\n ", output);
 	return output;
   }
 
@@ -119,20 +115,14 @@ public class TranslateUtils
 	
 	String prefix = StrUtils.strjoinNL("PREFIX  dc: <http://purl.org/dc/elements/1.1/>"
 				, "PREFIX  : <.>");
-	
-	System.out.printf("getFailTranslateFromId query_uri is %s\n ", uri);
-	
 
 	String output = "";
 	
 	Dataset dataset = Repository.get().dataset;
 	dataset.begin(ReadWrite.READ);
 	try {
-		//String q = "SELECT ?str WHERE { <" + uri + "> <" + DC.source + "> ?str }";
 		String query = "SELECT DISTINCT ?s WHERE {?s dc:source ?source FILTER regex(str(?s), \""+ uri +"\", \"i\")}";
 		Query q = QueryFactory.create(prefix + "\n" + query);	
-		
-		System.out.printf("getTranslateFromURI q is %s\n ", query);
 		
 		QueryExecution qexec = QueryExecutionFactory.create(q, dataset);
 		ResultSet result = qexec.execSelect();
@@ -143,10 +133,7 @@ public class TranslateUtils
 		dataset.end();
 	}
 	
-	System.out.printf("output is %s\n ", output);
 	return output;
-	
-	//return getTranslateFromURI(query_uri);
 	
   }
   
@@ -159,8 +146,6 @@ public class TranslateUtils
   public static String getTranslateFromId(URI uri, String id) {
 	
 	String query_uri = "http://" + uri.getHost() + "/translate/" + id;
-	
-	System.out.printf("getTranslateFromId query_uri is %s\n ", query_uri);
 	
 	return getTranslateFromURI(query_uri);
 	
