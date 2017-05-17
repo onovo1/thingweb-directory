@@ -239,7 +239,6 @@ public class Repository {
             }
             //Query Fail Translation Lookups (stored as /translate-fail/ in the database)
             i.add("/translate-lookup/fail", new TranslateFailLookUpHandler(servers));
-            //i.add("/fail-lookup", new TranslateFailLookUpHandler(servers));
             
             i.start();
         }
