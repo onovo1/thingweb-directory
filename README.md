@@ -189,7 +189,8 @@ coap://localhost:8080/td-lookup/sem?rdf=http://example.org/lightBrightness
 
 #### Translations
 
-Translations translates between two Thing Descriptions (TDs). TDs are the semantic representation of the information of a thing. However, different things have a limited understanding of the information represented in all the TDs. For this reason, a translation between TDs is needed. Thus, different things can interact and understand each other even though their TDs are different. 
+Translations translates between two Thing Descriptions (TDs). TDs are the semantic representation of the information of a thing. However, different things have a limited understanding of the information represented in all the TDs. For this reason, a translation between TDs is needed. Thus, different things can interact and understand each other even though their TDs are different.
+The translations do not have lifetime and stay permanently in the system.
 
 This API can create,read, update and delete (CRUD) translations. The functionality includes but is not limited to following cases:
 
