@@ -82,7 +82,6 @@ public class TranslateHandler extends RESTHandler {
 			modified = utils.getCurrentDateTime(0);
 				
 			// Remove properties and add new content
-			//tdb.getResource(uri.toString()).removeProperties().addLiteral(DC.source, data);
 			tdb.getResource(uri.toString()).removeProperties().addProperty(DC.source, data);
 				
 			// Store properties.
