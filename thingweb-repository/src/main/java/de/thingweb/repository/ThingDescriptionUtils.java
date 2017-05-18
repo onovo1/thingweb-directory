@@ -152,7 +152,7 @@ public class ThingDescriptionUtils
 	
 	return tds;
   }
-    
+
   /**
    * Returns true if a specific uri (optional uri+href) is already registered
    * in the database, false otherwise.
@@ -166,6 +166,24 @@ public class ThingDescriptionUtils
 	String prefix = StrUtils.strjoinNL("PREFIX  dc: <http://purl.org/dc/elements/1.1/>"
 				  					, "PREFIX  : <.>");
 
+	//add the character '/' as optional at the end of the string
+	if (uri != null && uri.length() > 0) { 
+		//remove first the character '/' from the end of the URI if it exists
+		if (uri.charAt(uri.length()-1)=='/') {
+	      uri = uri.substring(0, uri.length()-1);
+		}
+		uri = uri + "[/]?";		
+	}
+		
+	//add the character '/' as optional at the end of the string
+	if (href != null && href.length() > 0){
+		//remove first the character '/' from the end of the URI if it exists
+		if (href.charAt(href.length()-1)=='/') {
+		  href = href.substring(0, href.length()-1);
+		}	
+		href = href + "[/]?";
+	}
+		
 	String id = "NOT FOUND";
 	// Run the query
 	Dataset dataset = Repository.get().dataset;
@@ -189,9 +207,11 @@ public class ThingDescriptionUtils
 		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
 		ResultSet result = qexec.execSelect();
 		
+		
 		while (result.hasNext()) {
 			id = result.next().get("s").toString();
-			if (!id.equalsIgnoreCase(tdId)) {
+			
+			if (!id.equalsIgnoreCase(tdId)) {			
 				decision= true;
 				break;
 			}
