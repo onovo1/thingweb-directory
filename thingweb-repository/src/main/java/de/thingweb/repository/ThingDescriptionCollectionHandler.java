@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.codec.binary.Base32;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
@@ -141,7 +143,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		
 		// Check if new TD has uris already registered in the dataset or that TD is already registered
 		try {
-			registeredTD = ThingDescriptionUtils.registeredTD(data, null);
+			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString());
 		} catch (URISyntaxException e) {
 			throw new UnsupportedFormat();
 		}
@@ -170,7 +172,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		}
 
 		// to add new thing description to the collection
-		String id = generateID();
+		String id = generateID(data);
 		URI resourceUri = URI.create(normalize(uri) + "/" + id);
 		Dataset dataset = Repository.get().dataset;
 		List<String> keyWords;
@@ -244,10 +246,31 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		return path;
 	}
 	
-	private String generateID() {
+	private String generateID(String name) {
+		
+		String id = "";
+		Base32 base32 = new Base32();
+		ByteBuffer b = ByteBuffer.allocate(4);
+		
+		//get the hash code from the TD
+		int hash = name.hashCode();
+		
+		//convert int into array
+		byte[] hash_array = b.putInt(hash).array();
+		id = base32.encodeAsString(hash_array);
+		
+		//trim the string to a max of 10 characters
+		id = id.substring(0, Math.min(id.length(), 10));
+		
+		//remove # in the string if exist
+		id = id.replaceAll("=", "");
+		
+		//convert the string to lower case
+		return id.toLowerCase();
+		
 		// TODO better way?
-		String id = UUID.randomUUID().toString();
-		return id.substring(0, id.indexOf('-'));
+		//String id = UUID.fromString(name).toString();	
+		//return id.substring(0, id.indexOf('-'));
 	}
 
 }
