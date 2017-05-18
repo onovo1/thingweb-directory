@@ -1,30 +1,18 @@
 package de.thingweb.repository.translate;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
-import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.RDFS;
-
 import de.thingweb.repository.Repository;
 import de.thingweb.repository.ThingDescriptionUtils;
 import de.thingweb.repository.rest.BadRequestException;
-import de.thingweb.repository.rest.NotFoundException;
-import de.thingweb.repository.rest.UnsupportedFormat;
 import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
@@ -40,7 +28,6 @@ public class TranslateCollectionHandler extends RESTHandler {
 	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
 		
 		RESTResource resource = new RESTResource(name(uri), this);
-		boolean registeredTD = false;
 		String data = "";
 		String source = "";
 		String target = "";
@@ -76,7 +63,6 @@ public class TranslateCollectionHandler extends RESTHandler {
 		URI resourceUri = URI.create(normalize(uri) + "/" + id);
 		
 		Dataset dataset = Repository.get().dataset;
-		List<String> keyWords;
 
 		dataset.begin(ReadWrite.WRITE);
 		try {

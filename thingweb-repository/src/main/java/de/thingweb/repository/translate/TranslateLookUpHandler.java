@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import de.thingweb.repository.ThingDescriptionUtils;
 import de.thingweb.repository.rest.BadRequestException;
 import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
@@ -52,7 +53,7 @@ public class TranslateLookUpHandler extends RESTHandler {
 			resource.content = output;
 							
 			resource.content += "}";
-			
+
 	    // List of the Translations of the database
 		} else if (parameters.isEmpty()){
 			

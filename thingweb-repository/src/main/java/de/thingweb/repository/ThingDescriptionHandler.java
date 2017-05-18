@@ -21,7 +21,6 @@ import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDFS;
 
 import de.thingweb.repository.rest.BadRequestException;
-import de.thingweb.repository.rest.NotFoundException;
 import de.thingweb.repository.rest.RESTException;
 import de.thingweb.repository.rest.RESTHandler;
 import de.thingweb.repository.rest.RESTResource;
