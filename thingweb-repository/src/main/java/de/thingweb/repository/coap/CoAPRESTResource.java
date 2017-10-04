@@ -1,11 +1,16 @@
 package de.thingweb.repository.coap;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.californium.core.CoapResource;
@@ -131,6 +136,36 @@ public class CoAPRESTResource extends CoapResource {
 		return params;
 	}
 	
+	// convert InputStream to String
+		private static String getStringFromInputStream(InputStream is) {
+
+			BufferedReader br = null;
+			StringBuilder sb = new StringBuilder();
+
+			String line;
+			try {
+
+				br = new BufferedReader(new InputStreamReader(is));
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+			return sb.toString();
+
+		}
+		
 	protected InputStream payload(CoapExchange exchange) {
 	  return new ByteArrayInputStream(exchange.getRequestPayload());
 	}

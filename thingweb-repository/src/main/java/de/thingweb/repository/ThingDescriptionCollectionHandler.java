@@ -148,6 +148,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			throw new UnsupportedFormat();
 		}
 		
+		
 		if (registeredTD){
 			throw new BadRequestException();
 		}
@@ -160,7 +161,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		// to register a resource following the standard
 		String endpointName = "http://example.org/"; // this is temporary
 		String lifeTime = "86400"; // 24 hours by default in seconds
-
+		
 		// TODO make it mandatory. The rest are optional
 		if (parameters.containsKey(END_POINT) && !parameters.get(END_POINT).isEmpty()) {
 			endpointName = parameters.get(END_POINT);	
@@ -170,16 +171,16 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			lifeTime = parameters.get(LIFE_TIME);
 			// TODO enforce a minimal lifetime
 		}
-
+		
 		// to add new thing description to the collection
 		String id = generateID(data);
 		URI resourceUri = URI.create(normalize(uri) + "/" + id);
 		Dataset dataset = Repository.get().dataset;
 		List<String> keyWords;
-
+		
 		dataset.begin(ReadWrite.WRITE);
 		try {
-			
+		
 			//New graph model
 			Model tdbnm = dataset.getNamedModel(resourceUri.toString());
 			tdbnm.read(new ByteArrayInputStream(data.getBytes()), null, "JSON-LD");
@@ -187,14 +188,14 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			keyWords = utils.getModelKeyWords(tdbnm);
 			// TODO check TD validity
 			//dataset.close();
-
+		
 			//Adding the information of the new TD into the Default Model
 			Model tdb = dataset.getDefaultModel();
 			tdb.createResource(resourceUri.toString()).addProperty(DC.source, data);
-
+		
 			// Store key words as triple: ?g_id rdfs:comment "keyWordOrWords"
 			tdb.getResource(resourceUri.toString()).addProperty(RDFS.comment, StrUtils.strjoin(" ", keyWords));
-
+		
 			// Store END_POINT and LIFE_TIME as triples
 			String currentDate = utils.getCurrentDateTime(0);
 			String lifetimeDate = utils.getCurrentDateTime(Integer.parseInt(lifeTime));
@@ -202,15 +203,15 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.created, currentDate);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.modified, currentDate);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.dateAccepted, lifetimeDate);
-	  
+		
 			addToAll("/td/" + id, new ThingDescriptionHandler(id, instances));
 			dataset.commit();
-			
+		
 			// Add to priority queue
 			ThingDescription td = new ThingDescription(resourceUri.toString(), lifetimeDate);
 			Repository.get().tdQueue.add(td);
 			Repository.get().setTimer();
-			
+		
 			// TODO remove useless return
 			RESTResource resource = new RESTResource("/td/" + id, new ThingDescriptionHandler(id, instances));
 			return resource;

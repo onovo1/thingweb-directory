@@ -249,14 +249,14 @@ public class ThingDescriptionUtils
     	    
     	    if (hasTDwithSameURI(uri,null,tdId)) return true;
         }
-      } else if (root.has("base") && root.has("interactions")){
+      } else if (root.has("base") && root.has("interaction")){
     	  String base = root.getString("base");
 
-      	  JSONArray interactions = root.getJSONArray("interactions");
+      	  JSONArray interactions = root.getJSONArray("interaction");
           for (int i = 0; i < interactions.length(); ++i) {
         	  JSONObject interaction = interactions.getJSONObject(i);
-      	      if (interaction.has("links")){
-      	    	JSONArray links = interaction.getJSONArray("links");
+      	      if (interaction.has("link")){
+      	    	JSONArray links = interaction.getJSONArray("link");
       	    	for (int y = 0; y < links.length(); ++y) {
       	          JSONObject link = links.getJSONObject(y);
       	          if (link.has("href")){
@@ -278,12 +278,12 @@ public class ThingDescriptionUtils
       	    	throw new URISyntaxException("TD does not have URI", td);
       	      }
           }
-      } else if (root.has("interactions")){
-    	  JSONArray interactions = root.getJSONArray("interactions");
+      } else if (root.has("interaction")){
+    	  JSONArray interactions = root.getJSONArray("interaction");
           for (int i = 0; i < interactions.length(); ++i) {
         	  JSONObject interaction = interactions.getJSONObject(i);
-      	      if (interaction.has("links")){
-      	    	JSONArray links = interaction.getJSONArray("links");
+      	      if (interaction.has("link")){
+      	    	JSONArray links = interaction.getJSONArray("link");
       	    	for (int y = 0; y < links.length(); ++y) {
       	          JSONObject link = links.getJSONObject(y);
       	          if (link.has("href")){

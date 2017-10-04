@@ -25,6 +25,7 @@ public abstract class RESTHandler {
 	}
 	
 	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
+		//then you just access the reversedMap however you like...
 		throw new MethodNotAllowedException();
 	}
 	
