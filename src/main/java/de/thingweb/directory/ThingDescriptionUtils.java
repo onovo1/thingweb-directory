@@ -19,6 +19,9 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.json.JsonArray;
+
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -30,16 +33,16 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.sparql.util.QueryExecUtils;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class ThingDescriptionUtils {
 	
@@ -91,10 +94,10 @@ public class ThingDescriptionUtils {
    * Returns the ID of a thing description stored in the database given its URI.
    * @param uri URI of the thing description we want to return.
    * @return the ID of the thing description.
-   */
+   */  
   public static String getThingDescriptionIdFromUri(String uri) {
 	
-	String query = "?td <http://iot.linkeddata.es/def/wot#baseURI> <" + uri + ">";
+	/*String query = "?td <http://iot.linkeddata.es/def/wot#baseURI> <" + uri + ">";
 	String id = "NOT FOUND";
 	  
 	Dataset dataset = ThingDirectory.get().dataset;
@@ -109,11 +112,33 @@ public class ThingDescriptionUtils {
 	  }
 	} catch (Exception e) {
 	  e.printStackTrace();
-	  throw e;
+	  throw e;*/
+
+	String prefix = StrUtils.strjoinNL("PREFIX  dc: <http://purl.org/dc/elements/1.1/>"
+				  					, "PREFIX  : <.>");
+	String id = "NOT FOUND";
+
+	// Run the query
+	Dataset dataset = ThingDirectory.get().dataset;
+	dataset.begin(ReadWrite.READ);
+
+	  try {
+  	  String query = "SELECT DISTINCT ?g_id WHERE {?g_id dc:source ?uris FILTER regex(str(?uris), \""+ uri +"\", \"i\")}";
+	    Query q = QueryFactory.create(prefix + "\n" + query);	
+   		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
+		   ResultSet result = qexec.execSelect();
+		while (result.hasNext()) {
+			id = result.next().get("g_id").toString();
+		}
+		qexec.close();
+
+	  } catch (Exception e) {
+	    e.printStackTrace();
+		   throw e;
 	} finally {
 	  dataset.end();
 	}
-	
+
 	return id;
   }
 
@@ -146,6 +171,161 @@ public class ThingDescriptionUtils {
 	
 	return tds;
   }
+
+  /**
+   * Returns true if a specific uri (optional uri+href) is already registered
+   * in the database, false otherwise.
+   * 
+   * @return true or false.
+   */
+  public static boolean hasTDwithSameURI(String uri, String href, String tdId) {
+	
+	boolean decision = false;
+	String query = "";
+	String prefix = StrUtils.strjoinNL("PREFIX  dc: <http://purl.org/dc/elements/1.1/>"
+				  					, "PREFIX  : <.>");
+
+	//add the character '/' as optional at the end of the string
+	if (uri != null && uri.length() > 0) { 
+		//remove first the character '/' from the end of the URI if it exists
+		if (uri.charAt(uri.length()-1)=='/') {
+	      uri = uri.substring(0, uri.length()-1);
+		}
+		uri = uri + "[/]?";		
+	}
+		
+	//add the character '/' as optional at the end of the string
+	if (href != null && href.length() > 0){
+		//remove first the character '/' from the end of the URI if it exists
+		if (href.charAt(href.length()-1)=='/') {
+		  href = href.substring(0, href.length()-1);
+		}	
+		href = href + "[/]?";
+	}
+		
+	String id = "NOT FOUND";
+	// Run the query
+	Dataset dataset = Repository.get().dataset;
+	dataset.begin(ReadWrite.READ);
+
+	try {
+		if (href!=null){
+			query = "SELECT DISTINCT * WHERE {"
+					+ "?s dc:source ?source ." 
+			        + "FILTER (regex(str(?s), \"/td\", \"i\") && (regex(str(?source), \"\\\""+uri+"\\\"\", \"i\") || "
+			        + "(regex(str(?source), \"\\\"base\\\"\\\\s*:\\\\s*\\\""+uri+"\\\"\", \"i\") && regex(str(?source), \"\\\"href\\\"\\\\s*:\\\\s*\\\""+href+"\\\"\", \"i\"))))}";
+		} else {
+		  query = "SELECT DISTINCT * WHERE {"
+                  + "?s dc:source ?source . "
+                  + "FILTER (regex(str(?s), \"/td\", \"i\") && (regex(str(?source), \"\\\""+ uri +"\\\"\", \"i\")))}";
+		}
+	  
+	  Query q = QueryFactory.create(prefix + "\n" + query);	
+
+	  try {
+		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
+		ResultSet result = qexec.execSelect();
+		
+		
+		while (result.hasNext()) {
+			id = result.next().get("s").toString();
+			
+			if (!id.equalsIgnoreCase(tdId)) {			
+				decision= true;
+				break;
+			}
+		}
+		
+		qexec.close();
+
+	  } catch (Exception e) {
+		throw e;
+	  }
+	} finally {
+	  dataset.end();
+	}
+    
+	return decision;
+  }
+  
+  /**
+   * Returns true if td's uris are already registered
+   * in the database, false otherwise.
+   * Unless td is in the dataset with tdId.
+   * 
+   * It returns an error if the TD does not have any URI associated.
+   * 
+   * @return true or false.
+   */
+  public static boolean registeredTD(String td, String tdId) throws URISyntaxException {
+
+      JSONObject root = new JSONObject(td);
+      
+      if (root.has("uris")){
+        JSONArray uris = root.getJSONArray("uris");
+        for (int i = 0; i < uris.length(); ++i) {
+    	    String uri = uris.getString(i);
+    	    
+    	    if (hasTDwithSameURI(uri,null,tdId)) return true;
+        }
+      } else if (root.has("base") && root.has("interaction")){
+    	  String base = root.getString("base");
+
+      	  JSONArray interactions = root.getJSONArray("interaction");
+          for (int i = 0; i < interactions.length(); ++i) {
+        	  JSONObject interaction = interactions.getJSONObject(i);
+      	      if (interaction.has("link")){
+      	    	JSONArray links = interaction.getJSONArray("link");
+      	    	for (int y = 0; y < links.length(); ++y) {
+      	          JSONObject link = links.getJSONObject(y);
+      	          if (link.has("href")){
+          	        String uri = link.getString("href");
+          	      
+            	      //Check if the URI is a partial URI
+            	      if (uri.toLowerCase().startsWith("coap://") || uri.toLowerCase().startsWith("http://")){ 
+              	        if (hasTDwithSameURI(uri,null,tdId)) return true;
+            	      } else {
+          	        	if (hasTDwithSameURI(base,uri,tdId)) return true;
+          	          }
+      	          } else {
+            	    	//the TD does not have any URI
+            	    	throw new URISyntaxException("TD does not have URI", td);
+            	  }   
+      	    	}
+      	      } else {
+      	    	//the TD does not have any URI
+      	    	throw new URISyntaxException("TD does not have URI", td);
+      	      }
+          }
+      } else if (root.has("interaction")){
+    	  JSONArray interactions = root.getJSONArray("interaction");
+          for (int i = 0; i < interactions.length(); ++i) {
+        	  JSONObject interaction = interactions.getJSONObject(i);
+      	      if (interaction.has("link")){
+      	    	JSONArray links = interaction.getJSONArray("link");
+      	    	for (int y = 0; y < links.length(); ++y) {
+      	          JSONObject link = links.getJSONObject(y);
+      	          if (link.has("href")){
+          	        String uri = link.getString("href");
+          	        if (hasTDwithSameURI(uri,null,tdId)) return true;
+      	          } else {
+          	    	//the TD does not have any URI
+           	    	throw new URISyntaxException("TD does not have URI", td);
+      	          }
+      	    	}
+      	      } else {
+      	    	//the TD does not have any URI
+      	    	throw new URISyntaxException("TD does not have URI", td);
+      	      }
+          }
+      } else{
+    	  //the TD does not have any URI
+    	  throw new URISyntaxException("TD does not have URI", td);
+      }
+      
+      return false;
+  }
+
   
   /**
    * Returns true if td's uris are already registered
@@ -348,14 +528,16 @@ public class ThingDescriptionUtils {
 	dataset.begin(ReadWrite.READ);
 	
 	try {
-	  String query = "SELECT DISTINCT ?g WHERE { " + qMatch + " GRAPH ?g { FILTER NOT EXISTS { ?ontology a <http://www.w3.org/2002/07/owl#Ontology> } } }";
+	  //String query = "SELECT DISTINCT ?g WHERE { " + qMatch + " GRAPH ?g { FILTER NOT EXISTS { ?ontology a <http://www.w3.org/2002/07/owl#Ontology> } } }";
+	  String query = "SELECT DISTINCT ?s WHERE { GRAPH ?g { " + qMatch + " }}";
+
 	  Query q = QueryFactory.create(prefix + "\n" + query);
 	  
 	  try {
 		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
 		ResultSet result = qexec.execSelect();
 		while (result.hasNext()) {
-		  tds.add(result.next().get("g").asResource().getURI());
+		  tds.add(result.next().get("s").asResource().getURI());
 		}
 	  } catch (Exception e) {
 		throw e;
@@ -448,7 +630,6 @@ public class ThingDescriptionUtils {
 	  try {
 		lifeCal.setTime(dateFormat.parse(dateLife));
 		diff =  lifeCal.getTimeInMillis() - modCal.getTimeInMillis();
-		//System.out.println("Remaining time " + Long.toString(diff));
 		if (diff <= 0) {
 		  hasTime = false;
 		}

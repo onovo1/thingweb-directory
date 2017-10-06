@@ -48,6 +48,14 @@ repositories {
 }
 
 dependencies {
+
+    //JSON API
+    compile 'org.json:json:20160810'
+    
+    //Log4j
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.slf4j:slf4j-log4j12:1.7.18'
+    
 	//compile "com.github.thingweb.thingweb:thingweb-parser:master-SNAPSHOT"
 	compile "de.thingweb:thingweb-parser:v0.2.0+"
 	

@@ -50,6 +50,7 @@ import de.thingweb.directory.http.HTTPServer;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
 import de.thingweb.directory.rest.RESTServerInstance;
+import de.thingweb.directory.translate.*;
 
 public class ThingDirectory {
 	
@@ -117,6 +118,16 @@ public class ThingDirectory {
         }
 
         return vocabs;
+    }
+
+    private static List<String> listTranslations() {
+        List<String> tds = new ArrayList<>();
+
+        for (String uri : TranslateUtils.listTranslations("/translate/")) {
+            tds.add(uri.substring(uri.lastIndexOf("/") + 1));
+        }
+
+        return tds;
     }
     
     private void loadTDQueue() {
@@ -188,6 +199,7 @@ public class ThingDirectory {
     	// Default values
         int portCoAP = 5683;
         int portHTTP = 8080;
+     
         String loc = "db"; // directory to store the database //"jena-config.ttl";
         String lucene = "Lucene"; // directory to store lucene index
         
@@ -249,6 +261,17 @@ public class ThingDirectory {
                 i.add("/vocab/" + vocab, new VocabularyHandler(vocab, servers));
             }
       
+            //Querying all the Translations or specific Translation
+            i.add("/translate-lookup", new TranslateLookUpHandler(servers));
+            
+            //Adding/modifying/deleting Translations
+            i.add("/translate", new TranslateCollectionHandler(servers));
+            for (String translate : listTranslations()) {
+                i.add("/translate/" + translate, new TranslateHandler(translate, servers));
+            }
+            //Query Fail Translation Lookups (stored as /translate-fail/ in the database)
+            i.add("/translate-lookup/fail", new TranslateFailLookUpHandler(servers));
+            
             i.start();
         }        
     

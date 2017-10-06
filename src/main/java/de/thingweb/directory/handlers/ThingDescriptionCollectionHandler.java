@@ -4,13 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.jena.atlas.json.JsonParseException;
+import org.apache.commons.codec.binary.Base32;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
@@ -137,6 +139,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 	@Override
 	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
 		
+		boolean registeredTD = false;
 		String data = "";
 		try {
 			data = ThingDescriptionUtils.streamToString(payload);
@@ -146,15 +149,27 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			throw new BadRequestException();
 		}
 		
-		// Check if new TD has uris already registered in the dataset
-		if (ThingDescriptionUtils.hasInvalidURI(data)) {
+		// Check if new TD has uris already registered in the dataset or that TD is already registered
+		try {
+			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString());
+		} catch (URISyntaxException e) {
+			throw new RESTException();
+		}
+		
+		
+		if (registeredTD){
 			throw new BadRequestException();
 		}
+		
+		// Check if new TD has uris already registered in the dataset
+		/*if (ThingDescriptionUtils.hasInvalidURI(data)) {
+			throw new BadRequestException();
+		}*/
 		
 		// to register a resource following the standard
 		String endpointName = "http://example.org/"; // this is temporary
 		String lifeTime = "86400"; // 24 hours by default in seconds
-
+		
 		// TODO make it mandatory. The rest are optional
 		if (parameters.containsKey(END_POINT) && !parameters.get(END_POINT).isEmpty()) {
 			endpointName = parameters.get(END_POINT);	
@@ -164,9 +179,9 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			lifeTime = parameters.get(LIFE_TIME);
 			// TODO enforce a minimal lifetime
 		}
-
+		
 		// to add new thing description to the collection
-		String id = generateID();
+		String id = generateID(data);
 		URI resourceUri = URI.create(normalize(uri) + "/" + id);
 		Dataset dataset = ThingDirectory.get().dataset;
 		List<String> keyWords;
@@ -181,18 +196,25 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			// TODO check TD validity
 			
 			dataset.addNamedModel(resourceUri.toString(), inf.difference(schema));
-
+		
+/*		dataset.begin(ReadWrite.WRITE);
+		try {
+		
+			//New graph model
+			Model tdbnm = dataset.getNamedModel(resourceUri.toString());
+			tdbnm.read(new ByteArrayInputStream(data.getBytes()), null, "JSON-LD");
+			ThingDescriptionUtils utils = new ThingDescriptionUtils();
+			keyWords = utils.getModelKeyWords(tdbnm);
+			// TODO check TD validity
+			//dataset.close();
+		*/
+			//Adding the information of the new TD into the Default Model
 			Model tdb = dataset.getDefaultModel();
 			tdb.createResource(resourceUri.toString()).addProperty(DC.source, data);
-
-			// Get key words from statements
-			ThingDescriptionUtils utils = new ThingDescriptionUtils();
-			Model newThing = dataset.getNamedModel(resourceUri.toString());
-			keyWords = utils.getModelKeyWords(newThing);
-
+		
 			// Store key words as triple: ?g_id rdfs:comment "keyWordOrWords"
 			tdb.getResource(resourceUri.toString()).addProperty(RDFS.comment, StrUtils.strjoin(" ", keyWords));
-
+		
 			// Store END_POINT and LIFE_TIME as triples
 			String currentDate = utils.getCurrentDateTime(0);
 			String lifetimeDate = utils.getCurrentDateTime(Integer.parseInt(lifeTime));
@@ -200,7 +222,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.created, currentDate);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.modified, currentDate);
 			tdb.getResource(resourceUri.toString()).addProperty(DCTerms.dateAccepted, lifetimeDate);
-	  
+		
 			addToAll("/td/" + id, new ThingDescriptionHandler(id, instances));
 			dataset.commit();
 
@@ -210,7 +232,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			ThingDescription td = new ThingDescription(resourceUri.toString(), lifetimeDate);
 			ThingDirectory.get().tdQueue.add(td);
 			ThingDirectory.get().setTimer();
-			
+					
 			// TODO remove useless return
 			RESTResource resource = new RESTResource("/td/" + id, new ThingDescriptionHandler(id, instances));
 			return resource;
@@ -246,10 +268,31 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		return path;
 	}
 	
-	private String generateID() {
+	private String generateID(String name) {
+		
+		String id = "";
+		Base32 base32 = new Base32();
+		ByteBuffer b = ByteBuffer.allocate(4);
+		
+		//get the hash code from the TD
+		int hash = name.hashCode();
+		
+		//convert int into array
+		byte[] hash_array = b.putInt(hash).array();
+		id = base32.encodeAsString(hash_array);
+		
+		//trim the string to a max of 10 characters
+		id = id.substring(0, Math.min(id.length(), 10));
+		
+		//remove # in the string if exist
+		id = id.replaceAll("=", "");
+		
+		//convert the string to lower case
+		return id.toLowerCase();
+		
 		// TODO better way?
-		String id = UUID.randomUUID().toString();
-		return id.substring(0, id.indexOf('-'));
+		//String id = UUID.fromString(name).toString();	
+		//return id.substring(0, id.indexOf('-'));
 	}
 
 }
