@@ -1,7 +1,6 @@
 package de.thingweb.directory.rest;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;

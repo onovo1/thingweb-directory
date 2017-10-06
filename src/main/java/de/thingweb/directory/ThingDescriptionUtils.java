@@ -19,9 +19,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.json.JsonArray;
-
-import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
@@ -42,7 +39,6 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 public class ThingDescriptionUtils {
 	
@@ -205,7 +201,7 @@ public class ThingDescriptionUtils {
 		
 	String id = "NOT FOUND";
 	// Run the query
-	Dataset dataset = Repository.get().dataset;
+	Dataset dataset = ThingDirectory.get().dataset;
 	dataset.begin(ReadWrite.READ);
 
 	try {
@@ -528,8 +524,8 @@ public class ThingDescriptionUtils {
 	dataset.begin(ReadWrite.READ);
 	
 	try {
-	  //String query = "SELECT DISTINCT ?g WHERE { " + qMatch + " GRAPH ?g { FILTER NOT EXISTS { ?ontology a <http://www.w3.org/2002/07/owl#Ontology> } } }";
-	  String query = "SELECT DISTINCT ?s WHERE { GRAPH ?g { " + qMatch + " }}";
+	  String query = "SELECT DISTINCT ?g WHERE { " + qMatch + " GRAPH ?g { FILTER NOT EXISTS { ?ontology a <http://www.w3.org/2002/07/owl#Ontology> } } }";
+	  //String query = "SELECT DISTINCT ?s WHERE { GRAPH ?g { " + qMatch + " }}";
 
 	  Query q = QueryFactory.create(prefix + "\n" + query);
 	  
@@ -537,7 +533,7 @@ public class ThingDescriptionUtils {
 		QueryExecution qexec = QueryExecutionFactory.create(q , dataset);
 		ResultSet result = qexec.execSelect();
 		while (result.hasNext()) {
-		  tds.add(result.next().get("s").asResource().getURI());
+		  tds.add(result.next().get("g").asResource().getURI());
 		}
 	  } catch (Exception e) {
 		throw e;

@@ -1,16 +1,11 @@
 package de.thingweb.directory.handlers;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.rest.NotFoundException;
 import de.thingweb.directory.rest.RESTException;

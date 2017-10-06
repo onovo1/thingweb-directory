@@ -1,7 +1,5 @@
 package de.thingweb.repository;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -18,21 +16,12 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.atlas.json.JSON;
-import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonString;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.sparql.util.ModelUtils;
-import org.apache.jena.util.FileUtils;
-import org.apache.solr.client.solrj.request.CollectionAdminRequest.DeleteAlias;
-
 import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.VocabularyUtils;
@@ -128,7 +117,7 @@ public class ThingWebRepoTest {
 		tdIds = fanQR.keys();
 		
 		tdId = resource.path;
-		tdh = new ThingDescriptionHandler(tdId, Repository.get().servers);
+		tdh = new ThingDescriptionHandler(tdId, ThingDirectory.get().servers);
 		
 		for (String item : tdIds){
 			tdh.delete(new URI(baseUri + item), null, null);
@@ -181,7 +170,7 @@ public class ThingWebRepoTest {
 		Assert.assertFalse("TD temperatureSensor found", tdIds.contains(tdId2));
 		
 		// GET TD by id
-		tdh = new ThingDescriptionHandler(tdId, Repository.get().servers);
+		tdh = new ThingDescriptionHandler(tdId, ThingDirectory.get().servers);
 		resource = tdh.get(new URI(baseUri + tdId), null);
 		JsonObject o = JSON.parse(resource.content);
 		JsonValue v = o.get("base");

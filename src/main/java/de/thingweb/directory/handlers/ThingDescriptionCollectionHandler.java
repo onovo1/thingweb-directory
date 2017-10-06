@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-
 import org.apache.commons.codec.binary.Base32;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
@@ -19,7 +17,6 @@ import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.reasoner.ReasonerRegistry;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
@@ -190,21 +187,27 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		dataset.begin(ReadWrite.WRITE);
 		try {
 			
+			//New graph model
 			Model graph = ModelFactory.createDefaultModel();
-			graph.read(new ByteArrayInputStream(data.getBytes()), endpointName, "JSON-LD");
+			//graph.read(new ByteArrayInputStream(data.getBytes()), endpointName, "JSON-LD");
+			graph.read(new ByteArrayInputStream(data.getBytes()), null, "JSON-LD");
 			InfModel inf = ModelFactory.createInfModel(ReasonerRegistry.getOWLMicroReasoner(), schema, graph);
+			
+
+			ThingDescriptionUtils utils = new ThingDescriptionUtils();
+			keyWords = utils.getModelKeyWords(graph);
 			// TODO check TD validity
 			
 			dataset.addNamedModel(resourceUri.toString(), inf.difference(schema));
-		
-/*		dataset.begin(ReadWrite.WRITE);
+		/*
+		dataset.begin(ReadWrite.WRITE);
 		try {
 		
 			//New graph model
-			Model tdbnm = dataset.getNamedModel(resourceUri.toString());
-			tdbnm.read(new ByteArrayInputStream(data.getBytes()), null, "JSON-LD");
+			Model graph = dataset.getNamedModel(resourceUri.toString());
+			graph.read(new ByteArrayInputStream(data.getBytes()), null, "JSON-LD");
 			ThingDescriptionUtils utils = new ThingDescriptionUtils();
-			keyWords = utils.getModelKeyWords(tdbnm);
+			keyWords = utils.getModelKeyWords(graph);
 			// TODO check TD validity
 			//dataset.close();
 		*/

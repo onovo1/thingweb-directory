@@ -1,8 +1,6 @@
 package de.thingweb.directory.http;
 
 import java.util.EnumSet;
-import java.util.Map;
-
 import javax.servlet.DispatcherType;
 
 import org.eclipse.jetty.server.Server;

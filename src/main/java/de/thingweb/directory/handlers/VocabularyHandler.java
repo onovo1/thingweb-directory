@@ -1,30 +1,15 @@
 package de.thingweb.directory.handlers;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.ReadWrite;
-import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.vocabulary.DC;
-import org.apache.jena.vocabulary.DCTerms;
-import org.apache.jena.vocabulary.RDFS;
-
 import de.thingweb.directory.ThingDirectory;
-import de.thingweb.directory.ThingDescription;
-import de.thingweb.directory.ThingDescriptionUtils;
-import de.thingweb.directory.rest.BadRequestException;
-import de.thingweb.directory.rest.NotFoundException;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
 import de.thingweb.directory.rest.RESTResource;

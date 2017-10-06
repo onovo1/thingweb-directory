@@ -24,7 +24,6 @@ import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.ThingDescription;
 import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.rest.BadRequestException;
-import de.thingweb.directory.rest.NotFoundException;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
 import de.thingweb.directory.rest.RESTResource;
