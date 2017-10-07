@@ -62,7 +62,7 @@ public class TranslateLookUpHandler extends RESTHandler {
 			try {
 				translations = TranslateUtils.listTranslations("/translate/");
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 			JSONObject root = new JSONObject();
@@ -80,7 +80,7 @@ public class TranslateLookUpHandler extends RESTHandler {
 			resource.content = root.toString();
 			
 		} else {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 			
 		return resource;

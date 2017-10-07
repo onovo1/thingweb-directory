@@ -53,7 +53,7 @@ public class VocabularyCollectionHandler extends RESTHandler {
 		try {
 			vocabs = VocabularyUtils.listVocabularies();
 		} catch (Exception e) {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		Iterator<String> it = vocabs.iterator();
@@ -81,7 +81,7 @@ public class VocabularyCollectionHandler extends RESTHandler {
 			data = null;
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		} catch (URISyntaxException e2) {
 			// do nothing
 		}
@@ -103,7 +103,7 @@ public class VocabularyCollectionHandler extends RESTHandler {
 			
 			ExtendedIterator<Ontology> it = ontology.listOntologies();
 			if (!it.hasNext()) {
-					throw new BadRequestException();
+					throw new BadRequestException(null);
 			}
 			while (it.hasNext()) {
 				Ontology o = it.next();

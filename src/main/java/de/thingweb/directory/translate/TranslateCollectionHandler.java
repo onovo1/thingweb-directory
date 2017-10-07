@@ -37,7 +37,7 @@ public class TranslateCollectionHandler extends RESTHandler {
 			data = ThingDescriptionUtils.streamToString(payload);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		// GET source and target TD IDs from query parameters
@@ -47,7 +47,7 @@ public class TranslateCollectionHandler extends RESTHandler {
 			target = TranslateUtils.getid(parameters.get("target"));
 			rt	   = parameters.get("rt");
 		} else {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		String id = source + "_" + target + "_" + rt;
@@ -56,7 +56,7 @@ public class TranslateCollectionHandler extends RESTHandler {
 		String registeredTranslation = TranslateUtils.getTranslateFromId(uri, id);
 		
 		if (!registeredTranslation.isEmpty()){
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		// to add new translation to the collection

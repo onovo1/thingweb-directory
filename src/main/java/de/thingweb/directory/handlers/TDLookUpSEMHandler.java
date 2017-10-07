@@ -37,7 +37,7 @@ public class TDLookUpSEMHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listThingDescriptions(query);
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 		} else if (parameters.containsKey("text") && !parameters.get("text").isEmpty()) { // Full text search query
@@ -49,7 +49,7 @@ public class TDLookUpSEMHandler extends RESTHandler {
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Unable to retrieve Thing Description ");
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 		} else if (parameters.containsKey("rdf") && !parameters.get("rdf").isEmpty()) { // RDF type/value type query
@@ -58,7 +58,7 @@ public class TDLookUpSEMHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listRDFTypeValues(query);
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 			// Retrieve type values
@@ -77,7 +77,7 @@ public class TDLookUpSEMHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listThingDescriptions("?s ?p ?o");
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 		}
 		

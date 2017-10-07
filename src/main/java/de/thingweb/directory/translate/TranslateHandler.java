@@ -62,12 +62,12 @@ public class TranslateHandler extends RESTHandler {
 			data = ThingDescriptionUtils.streamToString(payload);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		// Check if the translation already exist in the dataset
 		if (TranslateUtils.getTranslateFromURI(uri.toString())== null) {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		Dataset dataset = ThingDirectory.get().dataset;

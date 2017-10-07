@@ -42,7 +42,7 @@ public class TDLookUpEPHandler extends RESTHandler {
 		try {
 			tds = ThingDescriptionUtils.listThingDescriptions("?s ?p ?o .");
 		} catch (Exception e) {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		// Retrieve Thing Description(s)

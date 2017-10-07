@@ -225,8 +225,7 @@ public class ThingDescriptionUtils {
 		
 		while (result.hasNext()) {
 			id = result.next().get("s").toString();
-			
-			if (!id.equalsIgnoreCase(tdId)) {			
+			if (id.equalsIgnoreCase(tdId)) {			
 				decision= true;
 				break;
 			}

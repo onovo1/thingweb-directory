@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.codec.binary.Base32;
 import org.apache.jena.atlas.lib.StrUtils;
 import org.apache.jena.query.Dataset;
@@ -60,7 +61,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listThingDescriptions(query);
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 		} else if (parameters.containsKey("text") && !parameters.get("text").isEmpty()) { // Full text search query
@@ -69,7 +70,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listThingDescriptionsFromTextSearch(query);
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 		} else if (parameters.containsKey("rdf") && !parameters.get("rdf").isEmpty()) { // RDF type/value type query
@@ -79,7 +80,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 				tds = ThingDescriptionUtils.listRDFTypeValues(query);
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 			
 			// Retrieve type values
@@ -98,7 +99,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 			try {
 				tds = ThingDescriptionUtils.listThingDescriptions("?s ?p ?o");
 			} catch (Exception e) {
-				throw new BadRequestException();
+				throw new BadRequestException(null);
 			}
 		}
 		
@@ -138,24 +139,26 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		
 		boolean registeredTD = false;
 		String data = "";
+		String id = "";
 		try {
 			data = ThingDescriptionUtils.streamToString(payload);
 			data = ThingDescriptionUtils.withLocalJsonLdContext(data);
+			//Generate ID of the data
+			id = generateID(data);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
-		
+				
 		// Check if new TD has uris already registered in the dataset or that TD is already registered
 		try {
-			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString());
+			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString()+ "/" + id);
 		} catch (URISyntaxException e) {
 			throw new RESTException();
 		}
 		
-		
 		if (registeredTD){
-			throw new BadRequestException();
+			throw new BadRequestException(uri.getPath()+ "/" + id);
 		}
 		
 		// Check if new TD has uris already registered in the dataset
@@ -178,7 +181,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		}
 		
 		// to add new thing description to the collection
-		String id = generateID(data);
+		//String id = generateID(data);
 		URI resourceUri = URI.create(normalize(uri) + "/" + id);
 		Dataset dataset = ThingDirectory.get().dataset;
 		List<String> keyWords;
@@ -271,7 +274,7 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		return path;
 	}
 	
-	private String generateID(String name) {
+	public static String generateID(String name) {
 		
 		String id = "";
 		Base32 base32 = new Base32();

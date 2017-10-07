@@ -67,23 +67,26 @@ public class ThingDescriptionHandler extends RESTHandler {
 	public void put(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
 		boolean registeredTD = false;
 		String data = "";
+		String id = "";
 		try {
 			data = ThingDescriptionUtils.streamToString(payload);
 			data = ThingDescriptionUtils.withLocalJsonLdContext(data);
+			//Generate ID of the data
+			id = ThingDescriptionCollectionHandler.generateID(data);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		// Check if new TD has uris already registered in the dataset
 		try {
-			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString());
+			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString()+ "/" + id);
 		} catch (URISyntaxException e) {
 			throw new RESTException();
 		}
 				
 		if (registeredTD){
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 				
 		// Check if new TD has uris already registered in the dataset
@@ -122,7 +125,7 @@ public class ThingDescriptionHandler extends RESTHandler {
 				td.read(new ByteArrayInputStream(data.getBytes()), endpointName, "JSON-LD");
 		  
 				if (td.isEmpty()) {
-					throw new BadRequestException();
+					throw new BadRequestException(null);
 				}
 				
 				// Check if life time value is given, otherwise use default
@@ -159,7 +162,7 @@ public class ThingDescriptionHandler extends RESTHandler {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		} catch (Exception e) {
 			// TODO distinguish between client and server errors
 			e.printStackTrace();

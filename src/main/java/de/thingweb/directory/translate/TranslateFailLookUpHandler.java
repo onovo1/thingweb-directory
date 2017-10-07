@@ -40,7 +40,7 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 		try {
 			translations = TranslateUtils.listTranslations("/translate-fail");
 		} catch (Exception e) {
-			throw new BadRequestException();
+			throw new BadRequestException(null);
 		}
 		
 		JSONObject root = new JSONObject();

@@ -69,6 +69,9 @@ public class CoAPRESTResource extends CoapResource {
 			response.setOptions(new OptionSet().addLocationPath(trim(resource.path)));
 			exchange.respond(response);
 		} catch (BadRequestException e) {
+			if (e.getPath()!=null){
+				exchange.setLocationPath(e.getPath());
+			}
 			exchange.respond(ResponseCode.BAD_REQUEST);
 		} catch (UnsupportedFormat e) {
 			exchange.respond(ResponseCode.UNSUPPORTED_CONTENT_FORMAT);

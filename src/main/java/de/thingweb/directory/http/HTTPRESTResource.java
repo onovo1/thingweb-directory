@@ -51,6 +51,9 @@ public class HTTPRESTResource extends HttpServlet {
       resp.setStatus(201);
       resp.setHeader("Location", res.path);
     } catch (BadRequestException e) {
+      if (e.getPath()!=null){	
+        resp.setHeader("Location", e.getPath());
+      }
       resp.sendError(400);
     } catch (UnsupportedFormat e) {
       resp.sendError(415);
