@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.rest.BadRequestException;
+import de.thingweb.directory.rest.UnsupportedFormat;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
 import de.thingweb.directory.rest.RESTResource;
@@ -51,6 +52,8 @@ public class HTTPRESTResource extends HttpServlet {
       resp.setHeader("Location", res.path);
     } catch (BadRequestException e) {
       resp.sendError(400);
+    } catch (UnsupportedFormat e) {
+      resp.sendError(415);
     } catch (RESTException e) {
       resp.sendError(500);
     }

@@ -21,6 +21,7 @@ import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.handlers.TDLookUpHandler;
 import de.thingweb.directory.handlers.ThingDescriptionCollectionHandler;
 import de.thingweb.directory.rest.BadRequestException;
+import de.thingweb.directory.rest.UnsupportedFormat;
 import de.thingweb.directory.rest.NotFoundException;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
@@ -69,6 +70,8 @@ public class CoAPRESTResource extends CoapResource {
 			exchange.respond(response);
 		} catch (BadRequestException e) {
 			exchange.respond(ResponseCode.BAD_REQUEST);
+		} catch (UnsupportedFormat e) {
+			exchange.respond(ResponseCode.UNSUPPORTED_CONTENT_FORMAT);
 		} catch (RESTException e) {
 			exchange.respond(ResponseCode.INTERNAL_SERVER_ERROR);
 		}
