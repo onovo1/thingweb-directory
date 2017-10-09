@@ -49,9 +49,10 @@ public class TranslateLookUpHandler extends RESTHandler {
 				TranslateFailLookUpHandler.addEntry(uri, id);		
 			}
 			
-			resource.content = output;
+		    resource.content += output;
 							
 			resource.content += "}";
+			
 
 	    // List of the Translations of the database
 		} else if (parameters.isEmpty()){
