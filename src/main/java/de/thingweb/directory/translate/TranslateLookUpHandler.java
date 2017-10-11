@@ -30,7 +30,8 @@ public class TranslateLookUpHandler extends RESTHandler {
 		String target = "";
 		String rt	  = "";
 		
-		resource.content = "{";
+		//resource.content = "{";
+		resource.content = "";
 		
 		// Single request of a Translation
 		// GET source and target TD IDs from query parameters
@@ -49,9 +50,9 @@ public class TranslateLookUpHandler extends RESTHandler {
 				TranslateFailLookUpHandler.addEntry(uri, id);		
 			}
 			
-		    resource.content += output;
+		    resource.content = output;
 							
-			resource.content += "}";
+			//resource.content += "}";
 			
 
 	    // List of the Translations of the database
