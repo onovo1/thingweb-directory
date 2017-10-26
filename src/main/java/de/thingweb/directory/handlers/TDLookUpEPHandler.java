@@ -48,16 +48,17 @@ public class TDLookUpEPHandler extends RESTHandler {
 		// Retrieve Thing Description(s)
 		for (int i = 0; i < tds.size(); i++) {
 			URI td = URI.create(tds.get(i));
-			
+		
 			// Filter by endpoint if given
 			if ( ep.equalsIgnoreCase(td.getPath()) || ep.isEmpty()) {
-			
+				
 				try {
 					ThingDescriptionHandler h = new ThingDescriptionHandler(td.toString(), instances);
 					RESTResource res = h.get(td, new HashMap<String, String>());
 					// TODO check TD's content type
 							
 					resource.content += "\"" + td.getPath() + "\": " + res.content;
+					
 					if (i < tds.size() - 1) {
 						resource.content += ",";
 					}
@@ -75,7 +76,12 @@ public class TDLookUpEPHandler extends RESTHandler {
 				}
 			}
 		}
-				
+		
+		// remove ","
+		if (resource.content.endsWith(",")) {
+			resource.content = resource.content.substring(0, resource.content.length() -1);
+		}
+		
 		resource.content += "}";	
 		return resource;
 	}
