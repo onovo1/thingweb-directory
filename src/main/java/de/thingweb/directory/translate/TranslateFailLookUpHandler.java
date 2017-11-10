@@ -1,5 +1,6 @@
 package de.thingweb.directory.translate;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
 
+import de.thingweb.directory.ThingDescription;
 import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.rest.BadRequestException;
@@ -58,7 +60,24 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 			
 	}
 	
-	public static void addEntry(URI uri, String id) {
+	@Override
+	public void delete(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
+
+		String id = "";
+		
+		// DELETE specific failLookUp
+		if (parameters.containsKey("translation") && !parameters.get("translation").isEmpty()) {
+			id = TranslateUtils.getid(parameters.get("translation"));
+			
+		    delete(uri, id);
+		
+		} else {
+			throw new BadRequestException(null);
+		}
+				
+	}
+	
+	public void addEntry(URI uri, String id) {
 		
 		// Check if the parameter is null
 		if (id.isEmpty()) {
@@ -87,7 +106,7 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 			tdb.createResource(str_uri).addProperty(DC.source, "");
 			tdb.getResource(str_uri).addProperty(DCTerms.created, currentDate);
 			tdb.getResource(str_uri).addProperty(DCTerms.modified, currentDate);
-			
+			addToAll("/translate-fail/" + id, new TranslateHandler(id, instances));
 			dataset.commit();
 			
 		} catch (Exception e) {
@@ -98,7 +117,7 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 	}
 	
 	
-	public static void delete(URI uri, String id) {
+	public void delete(URI uri, String id) {
 
 		// Check if the parameter is null
 		if (id.isEmpty()) {
@@ -117,8 +136,11 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 		Dataset dataset = ThingDirectory.get().dataset;
 		dataset.begin(ReadWrite.WRITE);
 		try {
+			
 			//dataset.getDefaultModel().getResource(resourceUri).removeProperties();
 			dataset.getDefaultModel().createResource(str_uri).removeProperties();
+			dataset.removeNamedModel(str_uri);
+            deleteToAll("/translate-fail/" + id);
 			dataset.commit();
 									
 		} catch (Exception e) {

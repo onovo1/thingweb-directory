@@ -258,6 +258,11 @@ public class ThingDescriptionUtils {
       
       if (root.has("uris")){
         JSONArray uris = root.getJSONArray("uris");
+        
+        if (uris.length() == 0) {
+        	return false;
+      	}
+        
         for (int i = 0; i < uris.length(); ++i) {
     	    String uri = uris.getString(i);
     	    
@@ -266,7 +271,14 @@ public class ThingDescriptionUtils {
       } else if (root.has("base") && root.has("interaction")){
     	  String base = root.getString("base");
 
+    	  if (hasTDwithSameURI(base,null,tdId)) return true;
+    	  
       	  JSONArray interactions = root.getJSONArray("interaction");
+      	  
+    	  if (interactions.length() == 0) {
+       	    return false;
+      	  }
+
           for (int i = 0; i < interactions.length(); ++i) {
         	  JSONObject interaction = interactions.getJSONObject(i);
       	      if (interaction.has("link")){
@@ -294,6 +306,10 @@ public class ThingDescriptionUtils {
           }
       } else if (root.has("interaction")){
     	  JSONArray interactions = root.getJSONArray("interaction");
+    	  if (interactions.length() == 0) {
+    		return false;
+    	  }
+    	  
           for (int i = 0; i < interactions.length(); ++i) {
         	  JSONObject interaction = interactions.getJSONObject(i);
       	      if (interaction.has("link")){

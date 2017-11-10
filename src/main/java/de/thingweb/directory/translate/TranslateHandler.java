@@ -14,6 +14,7 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
+
 import de.thingweb.directory.ThingDirectory;
 import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.rest.BadRequestException;
@@ -103,6 +104,7 @@ public class TranslateHandler extends RESTHandler {
 		dataset.begin(ReadWrite.WRITE);
 		try {
 			dataset.getDefaultModel().createResource(uri.toString()).removeProperties();
+					
 			deleteToAll(uri.getPath());
 			dataset.commit();
 									

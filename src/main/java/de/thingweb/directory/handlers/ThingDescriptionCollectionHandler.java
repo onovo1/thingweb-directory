@@ -135,7 +135,8 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 	}
 
 	@Override
-	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
+	public RESTResource post(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {		
+
 		
 		boolean registeredTD = false;
 		String data = "";

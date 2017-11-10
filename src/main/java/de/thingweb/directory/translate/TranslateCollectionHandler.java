@@ -88,8 +88,11 @@ public class TranslateCollectionHandler extends RESTHandler {
 			dataset.end();
 		}
 		
+		//Create an instance of the class
+		TranslateFailLookUpHandler translateFailLookUpHandler = new TranslateFailLookUpHandler(instances);
+		
 		//Delete the fail translation lookup if it exist in the database
-		TranslateFailLookUpHandler.delete(uri, id);
+		translateFailLookUpHandler.delete(uri, id);
 		
 		return resource;
 	}

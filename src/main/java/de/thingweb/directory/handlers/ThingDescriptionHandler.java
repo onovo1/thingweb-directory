@@ -84,7 +84,7 @@ public class ThingDescriptionHandler extends RESTHandler {
 		} catch (URISyntaxException e) {
 			throw new RESTException();
 		}
-				
+		
 		if (registeredTD){
 			throw new BadRequestException(null);
 		}
