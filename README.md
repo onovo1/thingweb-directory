@@ -186,9 +186,6 @@ coap://localhost:8080/td-lookup/sem?text="word1 AND word2"
 ```sh
 coap://localhost:8080/td-lookup/sem?rdf=http://example.org/lightBrightness
 ```
-## Open API Specification
-
-See `src/main/resources/api.json` for a formal specification of the Thing Directory API. This file is exposed by the server at `/api.json`. It can e.g. be processed by the [Swagger UI](http://swagger.io/swagger-ui/) to render an online documentation. See the [Open API Initiative](https://www.openapis.org/) for more details.
 
 #### Translations
 
@@ -292,6 +289,11 @@ Failure: 500 Internal Server Error
   Failure: 400 Bad Request
   Failure: 500 Internal Server Error
  ```
+
+## Open API Specification
+
+See `src/main/resources/api.json` for a formal specification of the Thing Directory API. This file is exposed by the server at `/api.json`. It can e.g. be processed by the [Swagger UI](http://swagger.io/swagger-ui/) to render an online documentation. See the [Open API Initiative](https://www.openapis.org/) for more details.
+
 
 ## Swagger Specification of Thingweb-Repository API
 
