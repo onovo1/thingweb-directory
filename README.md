@@ -241,7 +241,7 @@ URI Template: /translate/{id}
 URI Template Parameter:   
   {id} := ID of a Translation to be deleted
 Content-Type: application/ld+json
-Success: 200 OK
+Success: 202 OK
 Failure: 400 Bad Request
 Failure: 500 Internal Server Error
 ```
