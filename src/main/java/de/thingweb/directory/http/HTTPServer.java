@@ -1,6 +1,7 @@
 package de.thingweb.directory.http;
 
 import java.util.EnumSet;
+
 import javax.servlet.DispatcherType;
 
 import org.eclipse.jetty.server.Server;
@@ -43,6 +44,7 @@ public class HTTPServer implements RESTServerInstance {
     int mLength = 0, sLength = 0;
     
     for (ServletMapping m : handler.getServletMappings()) {
+      if (mLength > (handler.getServletMappings().length - 1)) break;
       if (!m.equals(mapping)) {
         mappings[mLength++] = m;
       }
@@ -50,6 +52,7 @@ public class HTTPServer implements RESTServerInstance {
     
     for (ServletHolder s : handler.getServlets()) {
       if (!s.equals(handler.getServlet(mapping.getServletName()))) {
+    	if (sLength > (handler.getServlets().length - 1)) break;
         servlets[sLength++] = s;
       }
     }

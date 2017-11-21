@@ -52,7 +52,7 @@ public class TranslateCollectionHandler extends RESTHandler {
 		
 		String id = source + "_" + target + "_" + rt;
 		
-		// Checking if the translation has already registered in the dataset.
+		// Checking if the translation has already been registered in the dataset.
 		String registeredTranslation = TranslateUtils.getTranslateFromId(uri, id);
 		
 		if (!registeredTranslation.isEmpty()){
@@ -91,7 +91,7 @@ public class TranslateCollectionHandler extends RESTHandler {
 		//Create an instance of the class
 		TranslateFailLookUpHandler translateFailLookUpHandler = new TranslateFailLookUpHandler(instances);
 		
-		//Delete the fail translation lookup if it exist in the database
+		//Delete the fail translation if it exist in the database
 		translateFailLookUpHandler.delete(uri, id);
 		
 		return resource;

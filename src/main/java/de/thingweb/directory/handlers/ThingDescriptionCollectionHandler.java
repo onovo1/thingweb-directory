@@ -152,16 +152,16 @@ public class ThingDescriptionCollectionHandler extends RESTHandler {
 		}
 				
 		// Check if new TD has uris already registered in the dataset or that TD is already registered
-		try {
+		try {			
 			registeredTD = ThingDescriptionUtils.registeredTD(data, uri.toString()+ "/" + id);
 		} catch (URISyntaxException e) {
 			throw new RESTException();
 		}
-		
+
 		if (registeredTD){
 			throw new BadRequestException(uri.getPath()+ "/" + id);
 		}
-		
+
 		// Check if new TD has uris already registered in the dataset
 		/*if (ThingDescriptionUtils.hasInvalidURI(data)) {
 			throw new BadRequestException();

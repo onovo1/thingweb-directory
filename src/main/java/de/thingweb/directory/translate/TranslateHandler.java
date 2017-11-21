@@ -104,10 +104,10 @@ public class TranslateHandler extends RESTHandler {
 		dataset.begin(ReadWrite.WRITE);
 		try {
 			dataset.getDefaultModel().createResource(uri.toString()).removeProperties();
-					
+			dataset.removeNamedModel(uri.toString());		
 			deleteToAll(uri.getPath());
 			dataset.commit();
-									
+			
 		} catch (Exception e) {
 			throw new RESTException();
 		} finally {
