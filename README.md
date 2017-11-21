@@ -187,11 +187,6 @@ coap://localhost:8080/td-lookup/sem?text="word1 AND word2"
 coap://localhost:8080/td-lookup/sem?rdf=http://example.org/lightBrightness
 ```
 
-<<<<<<< HEAD
-## Open API Specification
-
-See `src/main/resources/api.json` for a formal specification of the Thing Directory API. This file is exposed by the server at `/api.json`. It can e.g. be processed by the [Swagger UI](http://swagger.io/swagger-ui/) to render an online documentation. See the [Open API Initiative](https://www.openapis.org/) for more details.
-=======
 #### Translations
 
 Translations translates between two Thing Descriptions (TDs). TDs are the semantic representation of the information of a thing. However, different things have a limited understanding of the information represented in all the TDs. For this reason, a translation between TDs is needed. Thus, different things can interact and understand each other even though their TDs are different.
@@ -246,7 +241,7 @@ URI Template: /translate/{id}
 URI Template Parameter:   
   {id} := ID of a Translation to be deleted
 Content-Type: application/ld+json
-Success: 200 OK
+Success: 202 OK
 Failure: 400 Bad Request
 Failure: 500 Internal Server Error
 ```
@@ -295,8 +290,13 @@ Failure: 500 Internal Server Error
   Failure: 500 Internal Server Error
  ```
 
+## Open API Specification
+
+See `src/main/resources/api.json` for a formal specification of the Thing Directory API. This file is exposed by the server at `/api.json`. It can e.g. be processed by the [Swagger UI](http://swagger.io/swagger-ui/) to render an online documentation. See the [Open API Initiative](https://www.openapis.org/) for more details.
+
+
 ## Swagger Specification of Thingweb-Repository API
->>>>>>> ba9f73058983f9ac669dd919b1734b0b41e6f613
+
 
 ## TODOs
 
