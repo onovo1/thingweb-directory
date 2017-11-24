@@ -48,9 +48,9 @@ public class TranslateLookUpHandler extends RESTHandler {
 			// If it's empty add it into the failed lookup list
 			if (output.isEmpty()) {
 				//Create an instance of the class
-				TranslateFailLookUpHandler translateFailLookUpHandler = new TranslateFailLookUpHandler(instances);
+				TranslateFailHandler translateFailHandler = new TranslateFailHandler(id, instances);
 				
-				translateFailLookUpHandler.addEntry(uri, id);		
+				translateFailHandler.addEntry(uri, id);		
 			}
 			
 		    resource.content = output;

@@ -122,6 +122,16 @@ public class ThingDirectory {
         return tds;
     }
     
+    private static List<String> listFailTranslations() {
+        List<String> tds = new ArrayList<>();
+
+        for (String uri : TranslateUtils.listTranslations("/translate-fail/")) {
+            tds.add(uri.substring(uri.lastIndexOf("/") + 1));
+        }
+
+        return tds;
+    }
+    
     private void loadTDQueue() {
     	
     	ThingDescription td;
@@ -264,6 +274,11 @@ public class ThingDirectory {
             //Query Fail Translation Lookups (stored as /translate-fail/ in the database)
             i.add("/translate-lookup/fail", new TranslateFailLookUpHandler(servers));
             
+            //Adding/modifying/deleting Fail Translations
+            i.add("/translate-fail", new TranslateFailCollectionHandler(servers));
+            for (String failTranslate : listFailTranslations()) {
+                i.add("/translate-fail/" + failTranslate, new TranslateFailHandler(failTranslate, servers));
+            }
             i.start();
         }        
     

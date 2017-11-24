@@ -89,10 +89,10 @@ public class TranslateCollectionHandler extends RESTHandler {
 		}
 		
 		//Create an instance of the class
-		TranslateFailLookUpHandler translateFailLookUpHandler = new TranslateFailLookUpHandler(instances);
+		TranslateFailHandler translateFailHandler = new TranslateFailHandler(registeredTranslation, instances);
 		
 		//Delete the fail translation if it exist in the database
-		translateFailLookUpHandler.delete(uri, id);
+		translateFailHandler.delete(uri, id);
 		
 		return resource;
 	}

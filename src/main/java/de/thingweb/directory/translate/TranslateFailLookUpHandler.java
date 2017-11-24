@@ -1,21 +1,11 @@
 package de.thingweb.directory.translate;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.ReadWrite;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.vocabulary.DC;
-import org.apache.jena.vocabulary.DCTerms;
-
-import de.thingweb.directory.ThingDescription;
-import de.thingweb.directory.ThingDirectory;
-import de.thingweb.directory.ThingDescriptionUtils;
 import de.thingweb.directory.rest.BadRequestException;
 import de.thingweb.directory.rest.RESTException;
 import de.thingweb.directory.rest.RESTHandler;
@@ -59,97 +49,7 @@ public class TranslateFailLookUpHandler extends RESTHandler {
 		return resource;
 			
 	}
-	
-	@Override
-	public void delete(URI uri, Map<String, String> parameters, InputStream payload) throws RESTException {
 
-		String id = "";
-		
-		// DELETE specific failLookUp
-		if (parameters.containsKey("translation") && !parameters.get("translation").isEmpty()) {
-			id = TranslateUtils.getid(parameters.get("translation"));
-			
-		    delete(uri, id);
-		
-		} else {
-			throw new BadRequestException(null);
-		}
-				
-	}
-	
-	public void addEntry(URI uri, String id) {
-		
-		// Check if the parameter is null
-		if (id.isEmpty()) {
-			return;
-		} 
-		
-		// create the new id for the entry
-		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
-		
-		// Checking if the translation has already registered in the dataset.
-		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
-		
-		if (!registeredFailTranslation.isEmpty()){
-			return;
-		}
-		
-		Dataset dataset = ThingDirectory.get().dataset;
-
-		dataset.begin(ReadWrite.WRITE);
-		try {
-			
-			Model tdb = dataset.getDefaultModel();
-			ThingDescriptionUtils utils = new ThingDescriptionUtils();
-			
-			String currentDate = utils.getCurrentDateTime(0);
-			tdb.createResource(str_uri).addProperty(DC.source, "");
-			tdb.getResource(str_uri).addProperty(DCTerms.created, currentDate);
-			tdb.getResource(str_uri).addProperty(DCTerms.modified, currentDate);
-			addToAll("/translate-fail/" + id, new TranslateHandler(id, instances));
-			dataset.commit();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			dataset.end();
-		}	
-	}
-	
-	
-	public void delete(URI uri, String id) {
-
-		// Check if the parameter is null
-		if (id.isEmpty()) {
-			return;
-		} 
-		
-		// create the id of the entry
-		String str_uri = "http://" + uri.getHost() + "/translate-fail/" + id;
-		
-		// Checking if the translation has already registered in the dataset.
-		String registeredFailTranslation = TranslateUtils.getFailTranslateFromId(str_uri);
-		if (registeredFailTranslation.isEmpty()){
-			return;
-		}
-		
-		Dataset dataset = ThingDirectory.get().dataset;
-		dataset.begin(ReadWrite.WRITE);
-		try {
-			
-			//dataset.getDefaultModel().getResource(resourceUri).removeProperties();
-			dataset.getDefaultModel().createResource(str_uri).removeProperties();
-			dataset.removeNamedModel(str_uri);
-            deleteToAll("/translate-fail/" + id);
-			dataset.commit();
-									
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			dataset.end();
-		}
-	}
-	
 	private String name(URI uri) {
 		
 		String path = uri.getPath();

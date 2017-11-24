@@ -42,17 +42,18 @@ public class HTTPServer implements RESTServerInstance {
     ServletMapping[] mappings = new ServletMapping [handler.getServletMappings().length - 1];
     ServletHolder[] servlets = new ServletHolder [handler.getServlets().length - 1];
     int mLength = 0, sLength = 0;
-    
+
     for (ServletMapping m : handler.getServletMappings()) {
-      if (mLength > (handler.getServletMappings().length - 1)) break;
-      if (!m.equals(mapping)) {
+
+      if (mLength >= (handler.getServletMappings().length - 1)) break;
+      if (!m.equals(mapping)) {    	  
         mappings[mLength++] = m;
       }
     }
     
     for (ServletHolder s : handler.getServlets()) {
       if (!s.equals(handler.getServlet(mapping.getServletName()))) {
-    	if (sLength > (handler.getServlets().length - 1)) break;
+    	if (sLength >= (handler.getServlets().length - 1)) break;
         servlets[sLength++] = s;
       }
     }
